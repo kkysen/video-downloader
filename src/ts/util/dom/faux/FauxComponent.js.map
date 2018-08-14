@@ -1,0 +1,1 @@
+{"version":3,"file":"FauxComponent.js","sourceRoot":"","sources":["FauxComponent.ts"],"names":[],"mappings":";;AAEA,+CAA0C;AAgB7B,QAAA,aAAa,GAAuB;IAE7C,GAAG,CAAuB,OAAU;QAChC,MAAM,OAAO,GAAG,yBAAW,CAAC,GAAG,CAAC,OAAO,CAAC,CAAC;QACzC,OAAO;YACH,OAAO;YACP,MAAM,EAAE,OAAO,CAAC,MAAM;SACzB,CAAC;IACN,CAAC;CAEJ,CAAC"}
