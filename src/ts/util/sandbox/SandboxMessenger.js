@@ -61,14 +61,4 @@ exports.SandboxMessenger = {
         };
     },
 };
-exports.sandboxMain = async function () {
-    const sandbox = await exports.SandboxMessenger.new("sandbox.html");
-    anyWindow_1.globals({ sandbox });
-    console.log(sandbox);
-    const f = await sandbox.compile("(a, b) => a + b");
-    console.log(f);
-    const y = await f(2, 3);
-    console.log(y);
-};
-exports.sandbox = exports.SandboxMessenger.new("sandbox.html");
 //# sourceMappingURL=SandboxMessenger.js.map

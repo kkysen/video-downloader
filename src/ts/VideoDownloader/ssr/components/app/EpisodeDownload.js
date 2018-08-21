@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
 const react_1 = require("react");
-const iframe_1 = require("../../../../util/sandbox/iframe");
 const anyWindow_1 = require("../../../../util/window/anyWindow");
 const RawVideoDownload_1 = require("./RawVideoDownload");
 class EpisodeDownload extends react_1.Component {
@@ -10,19 +9,9 @@ class EpisodeDownload extends react_1.Component {
         super(props);
         this.state = {};
         anyWindow_1.inBrowser(async () => {
-            const { number, name, url, videoServerUrl } = this.props.episode;
-            window.addEventListener("message", ({ data }) => {
-                const { url: downloadUrl, href } = data;
-                if (downloadUrl && href === videoServerUrl) {
-                    console.log({ url, downloadUrl });
-                    this.setState({ url: downloadUrl });
-                }
-            });
-            if (number > 1 || name !== "Winter is Coming") {
-                return;
-            }
-            console.log(url);
-            const iframe = await iframe_1.createIframeSandbox(videoServerUrl);
+            const { fetchUrl, episode: { number, name, url, videoServerUrl } } = this.props;
+            const downloadUrl = await fetchUrl(videoServerUrl);
+            this.setState({ url: downloadUrl });
         });
     }
     render() {

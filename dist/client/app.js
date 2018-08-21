@@ -166,6 +166,18 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 
 /***/ }),
 
+/***/ "./src/ts/VideoDownloader/server/dir.ts":
+/*!**********************************************!*\
+  !*** ./src/ts/VideoDownloader/server/dir.ts ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("/* WEBPACK VAR INJECTION */(function(__filename) {\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst fs = __webpack_require__(/*! fs */ \"./node_modules/node-libs-browser/mock/empty.js\");\nconst path = __webpack_require__(/*! path */ \"./node_modules/path-browserify/index.js\");\nconst dirParts = path.parse(__filename).dir.split(path.sep);\nwhile (!fs.existsSync(path.join(...dirParts, \".git\"))) {\n    dirParts.pop();\n}\nvar dir;\n(function (dir) {\n    dir.root = path.join(...dirParts);\n    dir.dist = path.join(dir.root, \"dist\");\n    dir.clientDist = path.join(dir.dist, \"client\");\n    dir.serverDist = path.join(dir.dist, \"server\");\n    dir.src = path.join(dir.root, \"src\");\n    dir.data = path.join(dir.src, \"data\");\n    dir.ts = path.join(dir.src, \"ts\");\n    dir.project = path.join(dir.ts, \"VideoDownloader\");\n    dir.client = path.join(dir.project, \"client\");\n    dir.server = path.join(dir.project, \"server\");\n    dir.testData = path.join(dir.data, \"test\");\n})(dir = exports.dir || (exports.dir = {}));\n\n/* WEBPACK VAR INJECTION */}.call(this, \"/index.js\"))\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/server/dir.ts?");
+
+/***/ }),
+
 /***/ "./src/ts/VideoDownloader/share/data/Data.ts":
 /*!***************************************************!*\
   !*** ./src/ts/VideoDownloader/share/data/Data.ts ***!
@@ -214,6 +226,18 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 
 /***/ }),
 
+/***/ "./src/ts/VideoDownloader/share/websiteUrl.ts":
+/*!****************************************************!*\
+  !*** ./src/ts/VideoDownloader/share/websiteUrl.ts ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.baseWebsiteUrl = \"https://www9.fmovies.io\";\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/share/websiteUrl.ts?");
+
+/***/ }),
+
 /***/ "./src/ts/VideoDownloader/ssr/components/app/App.tsx":
 /*!***********************************************************!*\
   !*** ./src/ts/VideoDownloader/ssr/components/app/App.tsx ***!
@@ -222,7 +246,7 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst anyWindow_1 = __webpack_require__(/*! ../../../../util/window/anyWindow */ \"./src/ts/util/window/anyWindow.ts\");\nconst VideoDownloads_1 = __webpack_require__(/*! ./VideoDownloads */ \"./src/ts/VideoDownloader/ssr/components/app/VideoDownloads.tsx\");\nexports.App = ({ data }) => {\n    anyWindow_1.globals({ data });\n    if (anyWindow_1.isBrowser) {\n        window.addEventListener(\"message\", console.log);\n    }\n    return React.createElement(\"div\", { style: { margin: 25 } },\n        React.createElement(\"button\", { onClick: () => console.log(data) }, \"Button\"),\n        React.createElement(VideoDownloads_1.VideoDownloads, { shows: data.shows }));\n};\nexports.createApp = function (data) {\n    return React.createElement(exports.App, { data: data });\n};\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/ssr/components/app/App.tsx?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst fs = __webpack_require__(/*! fs-extra */ \"./node_modules/fs-extra/lib/index.js\");\nconst React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst axios_1 = __webpack_require__(/*! ../../../../lib/axios */ \"./src/ts/lib/axios.ts\");\nconst ControlledIFrame_1 = __webpack_require__(/*! ../../../../util/crossOrigin/ControlledIFrame */ \"./src/ts/util/crossOrigin/ControlledIFrame.ts\");\nconst utils_1 = __webpack_require__(/*! ../../../../util/misc/utils */ \"./src/ts/util/misc/utils.ts\");\nconst path_1 = __webpack_require__(/*! ../../../../util/polyfills/path */ \"./src/ts/util/polyfills/path.ts\");\nconst anyWindow_1 = __webpack_require__(/*! ../../../../util/window/anyWindow */ \"./src/ts/util/window/anyWindow.ts\");\nconst dir_1 = __webpack_require__(/*! ../../../server/dir */ \"./src/ts/VideoDownloader/server/dir.ts\");\nconst websiteUrl_1 = __webpack_require__(/*! ../../../share/websiteUrl */ \"./src/ts/VideoDownloader/share/websiteUrl.ts\");\nconst VideoDownloads_1 = __webpack_require__(/*! ./VideoDownloads */ \"./src/ts/VideoDownloader/ssr/components/app/VideoDownloads.tsx\");\nconst browserFetchUrl = (data) => {\n    const videoServerUrls = data.shows.all._()\n        .flatMap(show => show.seasons._())\n        .flatMap(season => season.episodes._())\n        .map(episode => episode.videoServerUrl);\n    const promises = new Map();\n    for (const url of videoServerUrls) {\n        const promiseToResolve = {};\n        promiseToResolve.promise = new Promise(resolve => {\n            promiseToResolve.resolve = resolve;\n        });\n        promises.set(url, promiseToResolve);\n    }\n    addEventListener(\"message\", ({ data: { url, href } }) => {\n        const promise = promises.get(href);\n        promise && promise.resolve(url);\n    });\n    const fetchUrl = videoServerUrl => promises.get(videoServerUrl).promise;\n    (async () => {\n        const fMovies = await ControlledIFrame_1.ControlledIFrame.new(websiteUrl_1.baseWebsiteUrl);\n        await fMovies((urls) => {\n            const downloadUrls = new Map();\n            addEventListener(\"message\", ({ data: { url, href } }) => {\n                console.log({ href, url });\n                downloadUrls.set(href, url);\n                window.parent !== window && window.parent.postMessage({ url, href }, \"*\");\n            });\n            for (const url of urls) {\n                const iframe = document.createElement(\"iframe\");\n                iframe.src = url;\n                iframe.hidden = true;\n                document.body.appendChild(iframe);\n                console.log(iframe);\n            }\n        }, videoServerUrls.slice(0, 1));\n        anyWindow_1.globals({ urls: videoServerUrls });\n    })();\n    return fetchUrl;\n};\nconst download = async function (data) {\n    const downloadUrls = new Map(await fs.readJson(path_1.path.join(dir_1.dir.data, \"downloadUrls.json\")));\n    const downloadDirDir = dir_1.dir.data; // can change\n    const downloadsDir = path_1.path.join(downloadDirDir, \"downloads\");\n    await fs.ensureDir(downloadsDir);\n    const shows = data.shows.all;\n    const downloadSeasons = (await shows._().asyncMap(async (show) => {\n        const showDir = path_1.path.join(downloadsDir, show.name);\n        await fs.ensureDir(showDir);\n        return show.seasons._().map(season => async () => {\n            const seasonName = `Season ${season.number}`;\n            const seasonDir = path_1.path.join(showDir, seasonName);\n            await fs.ensureDir(seasonDir);\n            const showSeasonName = [show.name, seasonName].join(\" - \");\n            const completedFile = path_1.path.join(seasonDir, \"completed.json\");\n            await fs.ensureFile(completedFile);\n            const completedEpisodes = new Set(await fs.readJson(completedFile));\n            if (completedEpisodes.size === season.episodes.length) {\n                console.log(`season already downloaded: ${showSeasonName}`);\n                return;\n            }\n            console.log(`downloading season: ${showSeasonName}`);\n            console.time(showSeasonName);\n            await season.episodes._().asyncMap(async (episode) => {\n                const name = `${show.name} - Season ${season.number} - Episode ${episode.number} - ${episode.name}`;\n                const episodeFile = path_1.path.join(seasonDir, `${name}.mp4`);\n                if (completedEpisodes.has(name)) {\n                    console.log(`episode already downloaded: ${name}`);\n                    return;\n                }\n                let href = episode.videoServerUrl;\n                if (href.startsWith(\"//\")) {\n                    href = \"https:\" + href;\n                }\n                const url = downloadUrls.get(encodeURI(href));\n                if (!url) {\n                    console.log(`no download url: ${name}`);\n                    return;\n                }\n                console.log(`downloading episode: ${name}: ${url}`);\n                console.time(name);\n                try {\n                    const response = await axios_1.axios.get(url, { responseType: \"stream\" });\n                    const { data, headers } = response;\n                    const contentLength = headers[\"content-length\"];\n                    console.log(`\\t${name}: ${contentLength << (2 * 10)} MB`);\n                    data.pipe(fs.createWriteStream(episodeFile));\n                    await new Promise((resolve, reject) => {\n                        data.on(\"end\", resolve);\n                        data.on(\"error\", reject);\n                    });\n                    completedEpisodes.add(name);\n                }\n                catch (e) {\n                    console.error(`download error: ${name}`);\n                    // console.error(e);\n                }\n                console.timeEnd(name);\n            });\n            console.timeEnd(showSeasonName);\n            await fs.writeJson(completedFile, [...completedEpisodes].sort());\n        });\n    })).flatMap(e => e);\n    for (const downloadSeason of downloadSeasons) {\n        // sometimes it gets stuck even after it finished downloading\n        // it doesn't recognize that the download is finished for some reason\n        await Promise.race([downloadSeason(), utils_1.sleep(60 * 45)]);\n    }\n};\nexports.App = ({ data }) => {\n    anyWindow_1.globals({ data });\n    // in node, never resolve promise\n    const fetchUrl = anyWindow_1.isBrowser ? browserFetchUrl(data) : () => new Promise(() => null);\n    (async () => {\n        await download(data);\n        console.log(\"done\");\n    })();\n    return React.createElement(\"div\", { style: { margin: 25 } },\n        React.createElement(\"button\", { onClick: () => console.log(data) }, \"Button\"),\n        React.createElement(VideoDownloads_1.VideoDownloads, { shows: data.shows, fetchUrl: fetchUrl }));\n};\nexports.createApp = function (data) {\n    return React.createElement(exports.App, { data: data });\n};\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/ssr/components/app/App.tsx?");
 
 /***/ }),
 
@@ -234,7 +258,7 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst react_1 = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst iframe_1 = __webpack_require__(/*! ../../../../util/sandbox/iframe */ \"./src/ts/util/sandbox/iframe.ts\");\nconst anyWindow_1 = __webpack_require__(/*! ../../../../util/window/anyWindow */ \"./src/ts/util/window/anyWindow.ts\");\nconst RawVideoDownload_1 = __webpack_require__(/*! ./RawVideoDownload */ \"./src/ts/VideoDownloader/ssr/components/app/RawVideoDownload.tsx\");\nclass EpisodeDownload extends react_1.Component {\n    constructor(props) {\n        super(props);\n        this.state = {};\n        anyWindow_1.inBrowser(async () => {\n            const { number, name, url, videoServerUrl } = this.props.episode;\n            window.addEventListener(\"message\", ({ data }) => {\n                const { url: downloadUrl, href } = data;\n                if (downloadUrl && href === videoServerUrl) {\n                    console.log({ url, downloadUrl });\n                    this.setState({ url: downloadUrl });\n                }\n            });\n            if (number > 1 || name !== \"Winter is Coming\") {\n                return;\n            }\n            console.log(url);\n            const iframe = await iframe_1.createIframeSandbox(videoServerUrl);\n        });\n    }\n    render() {\n        const { props: { episode: { name, number } }, state: { url } } = this;\n        // TODO add loading spinner\n        return React.createElement(\"div\", null,\n            \"Episode \",\n            number,\n            \": \",\n            name,\n            url && React.createElement(RawVideoDownload_1.RawVideoDownload, { url: url }));\n    }\n}\nexports.EpisodeDownload = EpisodeDownload;\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/ssr/components/app/EpisodeDownload.tsx?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst react_1 = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst anyWindow_1 = __webpack_require__(/*! ../../../../util/window/anyWindow */ \"./src/ts/util/window/anyWindow.ts\");\nconst RawVideoDownload_1 = __webpack_require__(/*! ./RawVideoDownload */ \"./src/ts/VideoDownloader/ssr/components/app/RawVideoDownload.tsx\");\nclass EpisodeDownload extends react_1.Component {\n    constructor(props) {\n        super(props);\n        this.state = {};\n        anyWindow_1.inBrowser(async () => {\n            const { fetchUrl, episode: { number, name, url, videoServerUrl } } = this.props;\n            const downloadUrl = await fetchUrl(videoServerUrl);\n            this.setState({ url: downloadUrl });\n        });\n    }\n    render() {\n        const { props: { episode: { name, number } }, state: { url } } = this;\n        // TODO add loading spinner\n        return React.createElement(\"div\", null,\n            \"Episode \",\n            number,\n            \": \",\n            name,\n            url && React.createElement(RawVideoDownload_1.RawVideoDownload, { url: url }));\n    }\n}\nexports.EpisodeDownload = EpisodeDownload;\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/ssr/components/app/EpisodeDownload.tsx?");
 
 /***/ }),
 
@@ -258,7 +282,7 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst EpisodeDownload_1 = __webpack_require__(/*! ./EpisodeDownload */ \"./src/ts/VideoDownloader/ssr/components/app/EpisodeDownload.tsx\");\nexports.SeasonDownload = ({ season: { number, episodes } }) => React.createElement(\"div\", null,\n    \"Season \",\n    number,\n    episodes.map((episode, i) => React.createElement(EpisodeDownload_1.EpisodeDownload, { episode: episode, key: i })));\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/ssr/components/app/SeasonDownload.tsx?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst EpisodeDownload_1 = __webpack_require__(/*! ./EpisodeDownload */ \"./src/ts/VideoDownloader/ssr/components/app/EpisodeDownload.tsx\");\nexports.SeasonDownload = ({ season: { number, episodes }, fetchUrl }) => React.createElement(\"div\", null,\n    \"Season \",\n    number,\n    episodes.map((episode, i) => React.createElement(EpisodeDownload_1.EpisodeDownload, { key: i, episode: episode, fetchUrl: fetchUrl })));\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/ssr/components/app/SeasonDownload.tsx?");
 
 /***/ }),
 
@@ -270,7 +294,7 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst SeasonDownload_1 = __webpack_require__(/*! ./SeasonDownload */ \"./src/ts/VideoDownloader/ssr/components/app/SeasonDownload.tsx\");\nexports.ShowDownload = ({ show: { name, seasons } }) => React.createElement(\"div\", null,\n    name,\n    seasons.map((season, i) => React.createElement(SeasonDownload_1.SeasonDownload, { season: season, key: i })));\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/ssr/components/app/ShowDownload.tsx?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst SeasonDownload_1 = __webpack_require__(/*! ./SeasonDownload */ \"./src/ts/VideoDownloader/ssr/components/app/SeasonDownload.tsx\");\nexports.ShowDownload = ({ show: { name, seasons }, fetchUrl }) => React.createElement(\"div\", null,\n    name,\n    seasons.map((season, i) => React.createElement(SeasonDownload_1.SeasonDownload, { key: i, season: season, fetchUrl: fetchUrl })));\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/ssr/components/app/ShowDownload.tsx?");
 
 /***/ }),
 
@@ -282,7 +306,19 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst ShowDownload_1 = __webpack_require__(/*! ./ShowDownload */ \"./src/ts/VideoDownloader/ssr/components/app/ShowDownload.tsx\");\nexports.VideoDownloads = ({ shows }) => React.createElement(\"div\", null, shows.all.map((show, i) => React.createElement(ShowDownload_1.ShowDownload, { show: show, key: i })));\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/ssr/components/app/VideoDownloads.tsx?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst React = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\nconst ShowDownload_1 = __webpack_require__(/*! ./ShowDownload */ \"./src/ts/VideoDownloader/ssr/components/app/ShowDownload.tsx\");\nexports.VideoDownloads = ({ shows, fetchUrl }) => React.createElement(\"div\", null, shows.all.map((show, i) => React.createElement(ShowDownload_1.ShowDownload, { key: i, show: show, fetchUrl: fetchUrl })));\n\n\n//# sourceURL=webpack:///./src/ts/VideoDownloader/ssr/components/app/VideoDownloads.tsx?");
+
+/***/ }),
+
+/***/ "./src/ts/lib/axios.ts":
+/*!*****************************!*\
+  !*** ./src/ts/lib/axios.ts ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst axios_1 = __webpack_require__(/*! axios */ \"./node_modules/axios/index.js\");\nexports.axios = axios_1.default;\n\n\n//# sourceURL=webpack:///./src/ts/lib/axios.ts?");
 
 /***/ }),
 
@@ -307,6 +343,18 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexport
 
 "use strict";
 eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.All = {\n    of(a, bySample) {\n        const map = (key) => new Map(a.map(e => [e[key], e]));\n        const mapBy = (key) => {\n            const byMap = map(key);\n            return (by) => byMap.get(by);\n        };\n        const maps = Object.keys(bySample)\n            .map(key => [key, mapBy(key)]);\n        const byMap = maps.toObject();\n        return {\n            all: a,\n            by: Object.assign(byMap, {\n                index: (i) => a[i],\n            }),\n        };\n    },\n};\n\n\n//# sourceURL=webpack:///./src/ts/util/collections/query/All.ts?");
+
+/***/ }),
+
+/***/ "./src/ts/util/crossOrigin/ControlledIFrame.ts":
+/*!*****************************************************!*\
+  !*** ./src/ts/util/crossOrigin/ControlledIFrame.ts ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst iframe_1 = __webpack_require__(/*! ../sandbox/iframe */ \"./src/ts/util/sandbox/iframe.ts\");\nconst anyWindow_1 = __webpack_require__(/*! ../window/anyWindow */ \"./src/ts/util/window/anyWindow.ts\");\nexports.ControlledIFrame = {\n    new: async (src) => {\n        if (!anyWindow_1.isBrowser) {\n            return ((f, t) => {\n                return Promise.resolve(f(t));\n            });\n        }\n        const iframe = await iframe_1.createIframeSandbox(src);\n        const window = iframe.contentWindow;\n        let nextId = 0;\n        const promises = new Map();\n        addEventListener(\"message\", ({ data: { id, evaluated } }) => {\n            const promise = promises.get(id);\n            promise && promise.resolve(evaluated);\n        });\n        return ((f, t) => {\n            const id = nextId++;\n            window.postMessage({ id, evaluate: f.toString(), args: t }, \"*\");\n            return new Promise((resolve, reject) => {\n                promises.set(id, { resolve, reject });\n            });\n        });\n    }\n};\n\n\n//# sourceURL=webpack:///./src/ts/util/crossOrigin/ControlledIFrame.ts?");
 
 /***/ }),
 
@@ -466,6 +514,18 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 
 /***/ }),
 
+/***/ "./src/ts/util/polyfills/path.ts":
+/*!***************************************!*\
+  !*** ./src/ts/util/polyfills/path.ts ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst nodePath = __webpack_require__(/*! path */ \"./node_modules/path-browserify/index.js\");\nconst anyWindow_1 = __webpack_require__(/*! ../window/anyWindow */ \"./src/ts/util/window/anyWindow.ts\");\nconst allExtensions_1 = __webpack_require__(/*! ../extensions/allExtensions */ \"./src/ts/util/extensions/allExtensions.ts\");\nexports.path = (() => {\n    if (anyWindow_1.isBrowser) {\n        const pathBrowserify = __webpack_require__(/*! path-browserify */ \"./node_modules/path-browserify/index.js\");\n        allExtensions_1.addExtensions();\n        const path = nodePath;\n        const oldNodePath = path.fullClone();\n        // add any missing properties in webpack's path polyfill\n        // with the complete path-browserify polyfill\n        // (even though they're supposed to be the same, they're not (path.parse is missing))\n        Object.defineProperties(nodePath, Object.getOwnPropertyDescriptors(pathBrowserify));\n        Object.defineProperties(nodePath, Object.getOwnPropertyDescriptors(oldNodePath));\n        return path;\n    }\n    else {\n        return nodePath;\n    }\n})();\nexports.pathLib = exports.path;\n\n\n//# sourceURL=webpack:///./src/ts/util/polyfills/path.ts?");
+
+/***/ }),
+
 /***/ "./src/ts/util/sandbox/iframe.ts":
 /*!***************************************!*\
   !*** ./src/ts/util/sandbox/iframe.ts ***!
@@ -523,6 +583,28 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 
 "use strict";
 eval("/* WEBPACK VAR INJECTION */(function(global) {\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst when_1 = __webpack_require__(/*! ../misc/when */ \"./src/ts/util/misc/when.ts\");\nexports.isBrowser = typeof window !== \"undefined\";\nexports.inBrowser = when_1.when(exports.isBrowser);\nexports.anyWindow = exports.isBrowser ? window : global;\nexports.globals = function (o) {\n    Object.assign(exports.anyWindow, o);\n};\nexports.globalProperties = function (o) {\n    Object.assignProperties(exports.anyWindow, o);\n};\nexports.globals({ globals: exports.globals, globalProperties: exports.globalProperties });\n\n/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../../node_modules/webpack/buildin/global.js */ \"./node_modules/webpack/buildin/global.js\")))\n\n//# sourceURL=webpack:///./src/ts/util/window/anyWindow.ts?");
+
+/***/ }),
+
+/***/ 0:
+/*!**********************!*\
+  !*** util (ignored) ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("/* (ignored) */\n\n//# sourceURL=webpack:///util_(ignored)?");
+
+/***/ }),
+
+/***/ 1:
+/*!**********************!*\
+  !*** util (ignored) ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("/* (ignored) */\n\n//# sourceURL=webpack:///util_(ignored)?");
 
 /***/ })
 

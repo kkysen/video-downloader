@@ -1,3 +1,4 @@
+import {ControlledIFrame} from "../../../util/crossOrigin/ControlledIFrame";
 import {AccessData} from "../../../util/data/DataAccessor";
 import {MaybePromise} from "../../../util/maybePromise/MaybePromise";
 import {DataAccessor} from "./access/DataAccessor";

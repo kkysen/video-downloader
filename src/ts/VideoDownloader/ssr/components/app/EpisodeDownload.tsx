@@ -1,13 +1,13 @@
 import * as React from "react";
 import {Component, ReactNode} from "react";
-import {createIframeSandbox} from "../../../../util/sandbox/iframe";
 import {inBrowser} from "../../../../util/window/anyWindow";
 import {Episode} from "../../../share/data/access/Show";
-import {baseWebsiteUrl} from "../../../share/websiteUrl";
+import {FetchUrl} from "./App";
 import {RawVideoDownload} from "./RawVideoDownload";
 
 interface EpisodeDownloadProps {
     episode: Episode;
+    fetchUrl: FetchUrl;
 }
 
 interface EpisodeDownloadState {
@@ -21,19 +21,9 @@ export class EpisodeDownload extends Component<EpisodeDownloadProps, EpisodeDown
     public constructor(props: EpisodeDownloadProps) {
         super(props);
         inBrowser(async () => {
-            const {number, name, url, videoServerUrl} = this.props.episode;
-            window.addEventListener("message", ({data}) => {
-                const {url: downloadUrl, href} = data as {url: string, href: string};
-                if (downloadUrl && href === videoServerUrl) {
-                    console.log({url, downloadUrl});
-                    this.setState({url: downloadUrl});
-                }
-            });
-            if (number > 1 || name !== "Winter is Coming") {
-                return;
-            }
-            console.log(url);
-            const iframe = await createIframeSandbox(videoServerUrl);
+            const {fetchUrl, episode: {number, name, url, videoServerUrl}} = this.props;
+            const downloadUrl = await fetchUrl(videoServerUrl);
+            this.setState({url: downloadUrl});
         });
     }
     
