@@ -63,7 +63,8 @@
     "rxjs": "^6.2.2",
     "wasm-brotli": "^1.0.2",
     "xlsx": "^0.13.2",
-    "zlib": "^1.0.5"
+    "zlib": "^1.0.5",
+    "zaproxy": "^0.3.0"
   },
   "main": "src/ts/VideoDownloader/server/server.js",
   "scripts": {
